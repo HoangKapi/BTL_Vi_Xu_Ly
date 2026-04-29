@@ -1,0 +1,49 @@
+<circuit version="1.1.0-SR1" rev="2005" stepSize="1000000" stepsPS="1000000" NLsteps="100000" reaStep="1000000" animate="0" >
+
+<item itemtype="KeyPad" CircId="KeyPad-6" mainComp="false" Show_id="false" Show_Val="false" Pos="-312,8" rotation="0" hflip="1" vflip="1" label="KeyPad-6" idLabPos="-8,-16" labelrot="0" valLabPos="-16,20" valLabRot="0" Rows="5" Cols="5" Key_Labels="0123456789+-*/S^&#x3D.DC()LAl" />
+
+<item itemtype="MCU" CircId="mega324-7" mainComp="false" Show_id="true" Show_Val="false" Pos="-200,20" rotation="0" hflip="1" vflip="1" label="mega324-7" idLabPos="0,-20" labelrot="0" valLabPos="-16,20" valLabRot="0" Frequency="16 MHz" Program="LOG_ABS/LOG_ABS/Debug/LOG_ABS.hex" Auto_Load="false" saveEepr="true" Logic_Symbol="false" Wdt_enabled="false" Clk_Out="false" MainMcu="true" SerialMon="-1" />
+
+<item itemtype="Fixed Voltage" CircId="Fixed Voltage-8" mainComp="false" Show_id="false" Show_Val="false" Pos="-236,204" rotation="0" hflip="1" vflip="1" label="Fixed Voltage-8" idLabPos="-64,-24" labelrot="0" valLabPos="-16,8" valLabRot="0" Voltage="5 V" Out="true" />
+
+<item itemtype="Hd44780" CircId="Hd44780-9" mainComp="false" Show_id="true" Show_Val="false" Pos="-252,-52" rotation="0" hflip="1" vflip="1" label="Hd44780-9" idLabPos="70,-82" labelrot="0" valLabPos="-16,20" valLabRot="0" Rows="2" Cols="16" />
+
+<item itemtype="Ground" CircId="Ground-10" mainComp="false" Show_id="false" Show_Val="false" Pos="-96,28" rotation="0" hflip="1" vflip="1" label="Ground-10" idLabPos="-16,8" labelrot="0" valLabPos="-16,20" valLabRot="0" />
+
+<item itemtype="Connector" uid="Connector-10" startpinid="Fixed Voltage-8-outnod" endpinid="mega324-7-RST" pointList="-220,204,-220,92,-208,92" />
+
+<item itemtype="Connector" uid="Connector-11" startpinid="mega324-7-PORTC0" endpinid="Hd44780-9-PinRS" pointList="-144,172,-144,-44,-236,-44" />
+
+<item itemtype="Connector" uid="Connector-12" startpinid="mega324-7-PORTC2" endpinid="Hd44780-9-PinEn" pointList="-144,156,-144,-44,-220,-44" />
+
+<item itemtype="Connector" uid="Connector-13" startpinid="Hd44780-9-PinRW" endpinid="Ground-10-Gnd" pointList="-228,-44,-228,12,-96,12" />
+
+<item itemtype="Connector" uid="Connector-14" startpinid="mega324-7-PORTC4" endpinid="Hd44780-9-dataPin4" pointList="-144,140,-144,-44,-180,-44" />
+
+<item itemtype="Connector" uid="Connector-15" startpinid="mega324-7-PORTC5" endpinid="Hd44780-9-dataPin5" pointList="-144,132,-144,-44,-172,-44" />
+
+<item itemtype="Connector" uid="Connector-16" startpinid="mega324-7-PORTC6" endpinid="Hd44780-9-dataPin6" pointList="-144,124,-144,-44,-164,-44" />
+
+<item itemtype="Connector" uid="Connector-17" startpinid="mega324-7-PORTC7" endpinid="Hd44780-9-dataPin7" pointList="-144,116,-144,-44,-156,-44" />
+
+<item itemtype="Connector" uid="Connector-18" startpinid="mega324-7-PORTB0" endpinid="KeyPad-6-Pin0" pointList="-208,28,-232,28,-232,16" />
+
+<item itemtype="Connector" uid="Connector-19" startpinid="KeyPad-6-Pin1" endpinid="mega324-7-PORTB1" pointList="-232,32,-208,32,-208,36" />
+
+<item itemtype="Connector" uid="Connector-20" startpinid="KeyPad-6-Pin2" endpinid="mega324-7-PORTB2" pointList="-232,48,-208,48,-208,44" />
+
+<item itemtype="Connector" uid="Connector-21" startpinid="KeyPad-6-Pin3" endpinid="mega324-7-PORTB3" pointList="-232,64,-220,64,-220,52,-208,52" />
+
+<item itemtype="Connector" uid="Connector-22" startpinid="KeyPad-6-Pin4" endpinid="mega324-7-PORTB4" pointList="-232,80,-212,80,-212,60,-208,60" />
+
+<item itemtype="Connector" uid="Connector-23" startpinid="KeyPad-6-Pin9" endpinid="mega324-7-PORTD0" pointList="-248,96,-248,132,-208,132" />
+
+<item itemtype="Connector" uid="Connector-24" startpinid="mega324-7-PORTD1" endpinid="KeyPad-6-Pin8" pointList="-208,140,-264,140,-264,96" />
+
+<item itemtype="Connector" uid="Connector-25" startpinid="mega324-7-PORTD2" endpinid="KeyPad-6-Pin7" pointList="-208,148,-280,148,-280,96" />
+
+<item itemtype="Connector" uid="Connector-26" startpinid="mega324-7-PORTD3" endpinid="KeyPad-6-Pin6" pointList="-208,156,-296,156,-296,96" />
+
+<item itemtype="Connector" uid="Connector-27" startpinid="mega324-7-PORTD4" endpinid="KeyPad-6-Pin5" pointList="-208,164,-312,164,-312,96" />
+
+</circuit>
