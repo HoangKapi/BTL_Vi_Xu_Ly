@@ -10,6 +10,7 @@
 #define LCD_DDR  DDRC
 #define RS 0
 #define EN 2
+#define PI 3.14159265
 
 int error_flag = 0;
 
@@ -54,30 +55,18 @@ void lcd_puts(char *s) {
 	while(*s) lcd_char(*s++);
 }
 
-// C?p nh?t l?i logic hi?n th? ?? in ra các hàm toán h?c ??p m?t
+// Hàm v? l?i toàn b? màn hình t? m?ng infix
 void refresh_display(char *infix, int idx) {
 	lcd_command(0x01);
 	for(int i = 0; i < idx; i++) {
 		if(infix[i] == 'S') lcd_puts("sqrt");
 		else if(infix[i] == 'A') lcd_puts("abs");
 		else if(infix[i] == 'L') lcd_puts("log");
-		else if(infix[i] == 'l') lcd_puts("log"); // log c? s? tùy ch?nh a log b
+		else if(infix[i] == 'l') lcd_puts("log_");
+		else if(infix[i] == 's') lcd_puts("sin");
+		else if(infix[i] == 'c') lcd_puts("cos");
+		else if(infix[i] == 't') lcd_puts("tan");
 		else lcd_char(infix[i]);
-	}
-}
-
-// Hàm h? tr? format chu?i s? ?? lo?i b? các s? 0 th?a (vd: 5.00 -> 5)
-void format_result(float val, char *buf) {
-	dtostrf(val, 0, 3, buf);
-	int len = strlen(buf);
-	if(strchr(buf, '.')) {
-		while(len > 0 && buf[len-1] == '0') {
-			buf[len-1] = '\0';
-			len--;
-		}
-		if(len > 0 && buf[len-1] == '.') {
-			buf[len-1] = '\0';
-		}
 	}
 }
 
@@ -99,9 +88,17 @@ int isEmptyC(StackC *s){ return s->top == -1; }
 int priority(char op){
 	if(op=='+'||op=='-') return 1;
 	if(op=='*'||op=='/') return 2;
-	if(op=='^'||op=='l') return 3; // 'l' là a log b (Toán t? 2 ngôi)
-	if(op=='S'||op=='A'||op=='L') return 4; // Các hàm 1 ngôi ?u tiên cao nh?t
+	if(op=='^' || op == 'l') return 3;
+	if(op=='S' || op=='A' || op=='L' || op=='!' || op=='c' || op=='s' || op=='t') return 4;
 	return 0;
+}
+
+float factorial(float n) { // hàm tính giai th?a
+	if (n < 0) { error_flag = 2; return 0; }
+	int num = (int)n;
+	float res = 1.0;
+	for (int i = 1; i <= num; i++) res *= i;
+	return res;
 }
 
 void infixToPostfix(char *infix, char *postfix){
@@ -111,7 +108,7 @@ void infixToPostfix(char *infix, char *postfix){
 
 	while(infix[i] != '\0'){
 		char c = infix[i];
-		if (c == '-' && last_was_op) {
+		if (c == '-' && last_was_op) { // S? âm
 			postfix[k++] = '-';
 			i++;
 			while((infix[i]>='0' && infix[i]<='9') || infix[i]=='.') postfix[k++] = infix[i++];
@@ -128,7 +125,7 @@ void infixToPostfix(char *infix, char *postfix){
 			while(!isEmptyC(&s) && peekC(&s) != '(') { postfix[k++] = popC(&s); postfix[k++] = ' '; }
 			popC(&s); i++; last_was_op = 0;
 		}
-		else {
+		else { // Toán t? +, -, *, /, ^, S, L, A, l, s, c, t, !
 			while(!isEmptyC(&s) && priority(peekC(&s)) >= priority(c)){
 				postfix[k++] = popC(&s); postfix[k++] = ' ';
 			}
@@ -147,7 +144,7 @@ float evalPostfix(char *postfix){
 			pushF(&s, atof(token));
 			} else {
 			char op = token[0];
-			if(op == 'S' || op == 'A' || op == 'L'){ // Toán t? 1 ngôi
+			if(op == 'S' || op == 'A' || op == 'L' || op == 'c' || op == 's' || op == 't' || op == '!'){ // Toán t? 1 ngôi
 				float a = popF(&s);
 				if(error_flag) return 0;
 
@@ -156,14 +153,26 @@ float evalPostfix(char *postfix){
 					pushF(&s, sqrt(a));
 				}
 				else if(op == 'A'){
-					pushF(&s, fabs(a));
+					pushF(&s, fabs(a)); // tr? tuy?t ??i
 				}
 				else if(op == 'L'){
 					if(a <= 0) { error_flag = 2; return 0; }
-					pushF(&s, log10(a));
+					pushF(&s, log10(a)); // log t? nhiên
+				}
+				else if(op == '!'){
+					pushF(&s, factorial(a));
+				}
+				else if(op == 's'){
+					pushF(&s, sin(a * PI / 180.0));
+				}
+				else if(op == 'c'){
+					pushF(&s, cos(a * PI / 180.0));
+				}
+				else if(op == 't'){
+					pushF(&s, tan(a * PI / 180.0));
 				}
 			}
-			else { // Toán t? 2 ngôi (+, -, *, /, ^, l)
+			else { // Toán t? 2 ngôi
 				float b = popF(&s);
 				float a = popF(&s);
 				if(error_flag) return 0;
@@ -177,7 +186,6 @@ float evalPostfix(char *postfix){
 					// a log b (log c? s? a c?a b) = ln(b) / ln(a)
 					if(a <= 0 || a == 1 || b <= 0) { error_flag = 2; return 0; }
 					pushF(&s, log(b) / log(a));
-					break;
 				}
 			}
 		}
@@ -189,15 +197,15 @@ float evalPostfix(char *postfix){
 // ================= KEYPAD FUNCTIONS =================
 char GET_KEY_RAW(void) {
 	PORTD = 0xFE; _delay_us(10);
-	switch(PINB & 0x1F){ case 0x1E: return '4'; case 0x1D: return '9'; case 0x1B: return 'S'; case 0x17: return 'C'; case 0x0F: return 'l';}
+	switch(PINB & 0x3F){ case 0x3E: return '4'; case 0x3D: return '9'; case 0x3B: return 'S'; case 0x37: return 'C'; case 0x2F: return 'M';} // Thay phím l b?ng M
 	PORTD = 0xFD; _delay_us(10);
-	switch(PINB & 0x1F){ case 0x1E: return '3'; case 0x1D: return '8'; case 0x1B: return '/'; case 0x17: return 'D'; case 0x0F: return 'A';}
+	switch(PINB & 0x3F){ case 0x3E: return '3'; case 0x3D: return '8'; case 0x3B: return '/'; case 0x37: return 'D'; case 0x2F: return 'A'; case 0x1F: return '!';}
 	PORTD = 0xFB; _delay_us(10);
-	switch(PINB & 0x1F){ case 0x1E: return '2'; case 0x1D: return '7'; case 0x1B: return '*'; case 0x17: return '.'; case 0x0F: return 'L';}
+	switch(PINB & 0x3F){ case 0x3E: return '2'; case 0x3D: return '7'; case 0x3B: return '*'; case 0x37: return '.'; case 0x2F: return '!'; case 0x1F: return 't';} // Thay phím L b?ng !
 	PORTD = 0xF7; _delay_us(10);
-	switch(PINB & 0x1F){ case 0x1E: return '1'; case 0x1D: return '6'; case 0x1B: return '-'; case 0x17: return '='; case 0x0F: return ')';}
+	switch(PINB & 0x3F){ case 0x3E: return '1'; case 0x3D: return '6'; case 0x3B: return '-'; case 0x37: return '='; case 0x2F: return ')'; case 0x1F: return 'c';}
 	PORTD = 0xEF; _delay_us(10);
-	switch(PINB & 0x1F){ case 0x1E: return '0'; case 0x1D: return '5'; case 0x1B: return '+'; case 0x17: return '^'; case 0x0F: return '(';}
+	switch(PINB & 0x3F){ case 0x3E: return '0'; case 0x3D: return '5'; case 0x3B: return '+'; case 0x37: return '^'; case 0x2F: return '('; case 0x1F: return 's';}
 	return 0;
 }
 
@@ -211,14 +219,10 @@ char GET_KEY(void) {
 	return key;
 }
 
-// ================= MAIN =================
 int main(void) {
 	char infix[100], postfix[100], res_str[16];
 	int idx = 0;
 	char key;
-	
-	int waiting_for_ans = 0;
-	float ans_val = 0.0;
 
 	DDRB = 0x00; PORTB = 0xFF; // Inputs
 	DDRD = 0xFF; DDRC = 0xFF; // Outputs
@@ -226,30 +230,6 @@ int main(void) {
 
 	while(1){
 		key = GET_KEY();
-		
-		// Kích ho?t tính n?ng ANS n?u ?ang có k?t qu?
-		if(waiting_for_ans) {
-			lcd_command(0x01);
-			waiting_for_ans = 0;
-			idx = 0;
-			
-			// N?u phím b?m là 1 toán t? 2 ngôi, t? ??ng chèn k?t qu? c? vào
-			if (!error_flag && (key == '+' || key == '-' || key == '*' || key == '/' || key == '^' || key == 'l')) {
-				format_result(ans_val, res_str);
-				for(int i = 0; res_str[i] != '\0'; i++) {
-					infix[idx++] = res_str[i];
-				}
-				infix[idx++] = key; // Chèn ti?p toán t? v?a b?m
-				refresh_display(infix, idx);
-				continue;
-			}
-			// N?u b?m C thì ch? c?n gi? idx = 0 (t?o m?i hoàn toàn)
-			else if (key == 'C') {
-				continue;
-			}
-			// N?u b?m phím khác (s?, hàm...), nó s? t? r?t xu?ng logic bên d??i ?? x? lý bình th??ng
-		}
-
 		if(key == '='){
 			if(idx == 0) continue;
 			infix[idx] = '\0';
@@ -257,33 +237,57 @@ int main(void) {
 			
 			error_flag = 0;
 			infixToPostfix(infix, postfix);
-			ans_val = evalPostfix(postfix);
+			float result = evalPostfix(postfix);
 
 			lcd_command(0xC0); // Dòng 2
 			if(error_flag == 1) lcd_puts("Syntax Error");
 			else if(error_flag == 2) lcd_puts("Math Error");
 			else {
-				format_result(ans_val, res_str);
+				dtostrf(result, 8, 2, res_str);
 				lcd_puts(res_str);
 			}
-			waiting_for_ans = 1; // B?t c? ch? cho l?n nh?n ti?p theo
+			while(GET_KEY() != 'C'); // ??i nh?n C
+			idx = 0; lcd_command(0x01);
 		}
 		else if(key == 'C'){ idx = 0; lcd_command(0x01); }
 		else if(key == 'D'){
 			if(idx > 0) { idx--; refresh_display(infix, idx); }
 		}
-		// X? lý thông minh: Nh?n L, A, S t? ??ng thêm d?u '('
-		else if(key == 'S' || key == 'A' || key == 'L'){
-			if(idx < 98) {
-				infix[idx++] = key;
-				infix[idx++] = '(';
-				refresh_display(infix, idx);
+		else if(key == 'M') {
+			lcd_command(0x01);
+			lcd_puts("1:TRIG  2:LOG");
+			
+			char menu_choice = GET_KEY();
+			if(menu_choice == '1') {
+				lcd_command(0x01);
+				lcd_puts("1:sin 2:cos 3:tan");
+				char trig_choice = GET_KEY();
+				if(trig_choice == '1' && idx < 98) { infix[idx++] = 's'; infix[idx++] = '('; }
+				else if(trig_choice == '2' && idx < 98) { infix[idx++] = 'c'; infix[idx++] = '('; }
+				else if(trig_choice == '3' && idx < 98) { infix[idx++] = 't'; infix[idx++] = '('; }
 			}
+			else if(menu_choice == '2') {
+				lcd_command(0x01);
+				lcd_puts("1:log(x) 2:log_ab");
+				char log_choice = GET_KEY();
+				if(log_choice == '1' && idx < 98) { infix[idx++] = 'L'; infix[idx++] = '('; }
+				else if(log_choice == '2' && idx < 99) { infix[idx++] = 'l'; }
+			}
+			refresh_display(infix, idx);
 		}
 		else {
 			if(idx < 99) {
-				infix[idx++] = key;
-				refresh_display(infix, idx);
+				if(key == 'S' || key == 'A' || key == 'L' || key == 's' || key == 'c' || key == 't') {
+					if(idx < 98) {
+						infix[idx++] = key;
+						infix[idx++] = '(';
+						refresh_display(infix, idx);
+					}
+				}
+				else {
+					infix[idx++] = key;
+					refresh_display(infix, idx);
+				}
 			}
 		}
 	}
