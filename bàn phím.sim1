@@ -1,8 +1,8 @@
 <circuit version="1.1.0-SR1" rev="2005" stepSize="1000000" stepsPS="1000000" NLsteps="100000" reaStep="1000000" animate="0" >
 
-<item itemtype="KeyPad" CircId="KeyPad-6" mainComp="false" Show_id="false" Show_Val="false" Pos="-312,8" rotation="0" hflip="1" vflip="1" label="KeyPad-6" idLabPos="-8,-16" labelrot="0" valLabPos="-16,20" valLabRot="0" Rows="5" Cols="5" Key_Labels="0123456789+-*/S^&#x3D.DC()LAl" />
+<item itemtype="KeyPad" CircId="KeyPad-6" mainComp="false" Show_id="false" Show_Val="false" Pos="-312,8" rotation="0" hflip="1" vflip="1" label="KeyPad-6" idLabPos="-8,-16" labelrot="0" valLabPos="-16,20" valLabRot="0" Rows="5" Cols="5" Key_Labels="0123456789+-*/S^&#x3D.DC()!AM" />
 
-<item itemtype="MCU" CircId="mega324-7" mainComp="false" Show_id="true" Show_Val="false" Pos="-200,20" rotation="0" hflip="1" vflip="1" label="mega324-7" idLabPos="0,-20" labelrot="0" valLabPos="-16,20" valLabRot="0" Frequency="16 MHz" Program="LOG_ABS/LOG_ABS/Debug/LOG_ABS.hex" Auto_Load="false" saveEepr="true" Logic_Symbol="false" Wdt_enabled="false" Clk_Out="false" MainMcu="true" SerialMon="-1" />
+<item itemtype="MCU" CircId="mega324-7" mainComp="false" Show_id="true" Show_Val="false" Pos="-200,20" rotation="0" hflip="1" vflip="1" label="mega324-7" idLabPos="0,-20" labelrot="0" valLabPos="-16,20" valLabRot="0" Frequency="16 MHz" Program="../../../Microchip/GccApplication1/GccApplication1/Debug/GccApplication1.hex" Auto_Load="false" saveEepr="true" Logic_Symbol="false" Wdt_enabled="false" Clk_Out="false" MainMcu="true" SerialMon="-1" />
 
 <item itemtype="Fixed Voltage" CircId="Fixed Voltage-8" mainComp="false" Show_id="false" Show_Val="false" Pos="-236,204" rotation="0" hflip="1" vflip="1" label="Fixed Voltage-8" idLabPos="-64,-24" labelrot="0" valLabPos="-16,8" valLabRot="0" Voltage="5 V" Out="true" />
 
